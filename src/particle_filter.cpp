@@ -58,6 +58,46 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	// NOTE: When adding noise you may find std::normal_distribution and std::default_random_engine useful.
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
+	
+	// random generator for gaussian noise
+	default_random_engine gen;
+
+	// update each particle
+	for (int i=0; i < num_particles; ++i) {
+		// check for 0 yaw rate 
+		if (yaw_rate != 0) {
+			// intermediate variables
+			double theta = particles[i].theta;
+			double v_yaw = velocity / yaw_rate;
+
+			// calculate new particle state
+			double nx = particles[i].x + v_yaw*(sin(theta + yaw_rate*delta_t) - sin(theta));
+			double ny = particles[i].y + v_yaw*(cos(theta) - cos(theta + yaw_rate*delta_t));
+			double ntheta = particles[i].theta + yaw_rate*delta_t;
+
+			// sample new pos from gaussian
+			normal_distribution<double> dist_nx(nx, std_pos[0]);
+			normal_distribution<double> dist_ny(ny, std_pos[1]);
+			normal_distribution<double> dist_ntheta(ntheta, std_pos[2]);
+
+			particles[i].x = dist_nx(gen);
+			particles[i].y = dist_ny(gen);
+			particles[i].theta = dist_ntheta(gen);
+		}
+		else {
+
+		}
+	}
+	// PSEUDO-CODE
+	/*
+	 * for each particle:
+	 * 	if yaw_rate == 0:
+	 * 		calculate x, y, theta (look up equation)
+	 * 		add gaussian noise with mean == new values ??
+	 * 	else:
+	 * 		calculate x, y, theta (equation in lesson 9)
+	 * 		add gaussian noise with mean == new values ??
+	 */
 
 }
 
