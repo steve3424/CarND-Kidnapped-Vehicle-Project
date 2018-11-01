@@ -62,14 +62,13 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	// random generator for gaussian noise
 	default_random_engine gen;
 
-	// update each particle
-	for (int i=0; i < num_particles; ++i) {
-		// check for 0 yaw rate 
-		if (yaw_rate != 0) {
+	// check for 0 yaw rate
+	if (yaw_rate != 0) {
+		for (int i=0; i < num_particles; ++i) {
 			// intermediate variables
 			double theta = particles[i].theta;
 			double v_yaw = velocity / yaw_rate;
-
+			
 			// calculate new particle state
 			double nx = particles[i].x + v_yaw*(sin(theta + yaw_rate*delta_t) - sin(theta));
 			double ny = particles[i].y + v_yaw*(cos(theta) - cos(theta + yaw_rate*delta_t));
@@ -84,7 +83,9 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 			particles[i].y = dist_ny(gen);
 			particles[i].theta = dist_ntheta(gen);
 		}
-		else {
+	}
+	else {
+		for (int i=0; i < num_particles; ++i) {
 			// calculate new particle state
 			double ntheta = particles[i].theta;
 			double nx = particles[i].x + velocity*delta_t*cos(ntheta);
@@ -98,9 +99,8 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 			particles[i].x = dist_nx(gen);
 			particles[i].y = dist_ny(gen);
 			particles[i].theta = dist_ntheta(gen);
-		}
+		}	
 	}
-
 }
 
 void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
