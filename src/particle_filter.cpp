@@ -85,19 +85,21 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 			particles[i].theta = dist_ntheta(gen);
 		}
 		else {
+			// calculate new particle state
+			double ntheta = particles[i].theta;
+			double nx = particles[i].x + velocity*delta_t*cos(ntheta);
+			double ny = particles[i].y + velocity*delta_t*sin(ntheta);
+			
+			// sample new state from gaussian
+			normal_distribution<double> dist_nx(nx, std_pos[0]);
+			normal_distribution<double> dist_ny(ny, std_pos[1]);
+			normal_distribution<double> dist_ntheta(ntheta, std_pos[2]);
 
+			particles[i].x = dist_nx(gen);
+			particles[i].y = dist_ny(gen);
+			particles[i].theta = dist_ntheta(gen);
 		}
 	}
-	// PSEUDO-CODE
-	/*
-	 * for each particle:
-	 * 	if yaw_rate == 0:
-	 * 		calculate x, y, theta (look up equation)
-	 * 		add gaussian noise with mean == new values ??
-	 * 	else:
-	 * 		calculate x, y, theta (equation in lesson 9)
-	 * 		add gaussian noise with mean == new values ??
-	 */
 
 }
 
