@@ -129,26 +129,32 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
 	
+	// gaussian noise for observation coordinates
+	default_random_engine gen;
+	normal_distribution<double> dist_x(0, std_landmark[0]);
+	normal_distribution<double> dist_y(0, std_landmark[1]);
 
-	// loop through each particle to update its weight
+	// loop through each particle to update
 	for (int i=0; i < num_particles; ++i) {
 		for (unsigned int j=0; j < observations.size(); ++j) {
+			/////// TRANSFORM //////
 			LandmarkObs map_coords;
 			// intermediate variables
 			double x_particle = particles[i].x;
 			double y_particle = particles[i].y;
-			double x_obs = observations[j].x;
-			double y_obs = observations[j].y;
+			double x_obs = observations[j].x + dist_x(gen);
+			double y_obs = observations[j].y + dist_y(gen);
 			double theta = particles[i].theta;
 
 			// calculate map coords
 			map_coords.x = double(x_particle + (cos(theta)*x_obs) - (sin(theta)*y_obs));
 			map_coords.y = double(y_particle + (sin(theta)*x_obs) + (cos(theta)*y_obs));
 
+			/////// ASSOCIATE /////////
 			// find closest landmark for this transformed observation 
 			double shortest_distance = std::numeric_limits<double>::infinity(); 
 			for (unsigned int k=0; k < map_landmarks.landmark_list.size(); ++k) {
-				// intermediate varaibles
+				// intermediate variables
 				double land_x = map_landmarks.landmark_list[k].x_f;
 				double land_y = map_landmarks.landmark_list[k].y_f;
 				double distance = dist(map_coords.x, map_coords.y, land_x, land_y);
