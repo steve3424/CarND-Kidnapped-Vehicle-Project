@@ -62,6 +62,9 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	
 	// random generator for gaussian noise
 	default_random_engine gen;
+	normal_distribution<double> dist_x(0, std_pos[0]);
+	normal_distribution<double> dist_y(0, std_pos[1]);
+	normal_distribution<double> dist_theta(0, std_pos[2]);
 
 	// check for 0 yaw rate
 	if (yaw_rate != 0) {
@@ -75,11 +78,12 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 			double ny = particles[i].y + v_yaw*(cos(theta) - cos(theta + yaw_rate*delta_t));
 			double ntheta = particles[i].theta + yaw_rate*delta_t;
 
-			// sample new pos from gaussian
-			normal_distribution<double> dist_nx(nx, std_pos[0]);
-			normal_distribution<double> dist_ny(ny, std_pos[1]);
-			normal_distribution<double> dist_ntheta(ntheta, std_pos[2]);
+			// add noise
+			nx += dist_x(gen);
+			ny += dist_y(gen);
+			ntheta += dist_theta(gen);	
 
+			// set particle position
 			particles[i].x = dist_nx(gen);
 			particles[i].y = dist_ny(gen);
 			particles[i].theta = dist_ntheta(gen);
