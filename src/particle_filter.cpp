@@ -14,6 +14,7 @@
 #include <sstream>
 #include <string>
 #include <iterator>
+#include <limits>
 
 #include "particle_filter.h"
 
@@ -32,13 +33,13 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	normal_distribution<double> dist_theta(theta, std[2]);
 
 	// set num of particles
-	num_particles = 1000;
+	num_particles = 10;
 
 	// create all particles
 	for (int i=0; i < num_particles; ++i) {
 		// create single particle
 		Particle particle;	
-		particle.id = i;
+		particle.id = i+1;
 		particle.x = dist_x(gen);
 		particle.y = dist_y(gen);
 		particle.theta = dist_theta(gen);
@@ -124,24 +125,35 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
 	
-	// transform vehicle observations to map coordinates for each particle perspective
+
+	// loop through each particle to update its weight
 	for (int i=0; i < num_particles; ++i) {
-		vector<LandmarkObs> particle_obs; 
 		for (unsigned int j=0; j < observations.size(); ++j) {
 			LandmarkObs map_coords;
 			// intermediate variables
 			double x_particle = particles[i].x;
 			double y_particle = particles[i].y;
-			double x_obs = observations[i].x;
-			double y_obs = observations[i].y;
+			double x_obs = observations[j].x;
+			double y_obs = observations[j].y;
 			double theta = particles[i].theta;
 
 			// calculate map coords
 			map_coords.x = double(x_particle + (cos(theta)*x_obs) - (sin(theta)*y_obs));
 			map_coords.y = double(y_particle + (sin(theta)*x_obs) + (cos(theta)*y_obs));
 
-			// add to vector
-			particle_obs.push_back(map_coords);
+			// find closest landmark for this transformed observation 
+			double shortest_distance = std::numeric_limits<double>::infinity(); 
+			for (unsigned int k=0; k < map_landmarks.landmark_list.size(); ++k) {
+				// intermediate varaibles
+				double land_x = map_landmarks.landmark_list[k].x_f;
+				double land_y = map_landmarks.landmark_list[k].y_f;
+				double distance = dist(map_coords.x, map_coords.y, land_x, land_y);
+				
+				if (distance < shortest_distance) {
+					shortest_distance = distance;
+					map_coords.id = map_landmarks.landmark_list[k].id_i;
+				}
+			}
 		}
 	}
 }
