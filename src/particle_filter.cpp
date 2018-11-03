@@ -136,6 +136,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 	// loop through each particle to update
 	for (int i=0; i < num_particles; ++i) {
+		double new_weight = 1.0;
 		for (unsigned int j=0; j < observations.size(); ++j) {
 			/////// TRANSFORM //////
 			LandmarkObs map_coords;
@@ -158,13 +159,27 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 				double land_x = map_landmarks.landmark_list[k].x_f;
 				double land_y = map_landmarks.landmark_list[k].y_f;
 				double distance = dist(map_coords.x, map_coords.y, land_x, land_y);
-				
+
 				if (distance < shortest_distance) {
 					shortest_distance = distance;
 					map_coords.id = map_landmarks.landmark_list[k].id_i;
 				}
 			}
+
+			/////// UPDATE WEIGHT //////
+			// intermediate variables
+			int index = map_coords.id - 1;
+			double x = map_coords.x;
+			double y = map_coords.y;
+			double mu_x = map_landmarks.landmark_list[index].x_f;
+			double mu_y = map_landmarks.landmark_list[index].y_f;
+
+			// calculate multi-variate gaussian for obs,landmark association
+			new_weight *= mv_gauss(x, y, mu_x, mu_y, std_landmark);
 		}
+
+		// set new weight
+		particles[i].weight = new_weight;
 	}
 }
 
