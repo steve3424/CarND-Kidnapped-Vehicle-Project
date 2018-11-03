@@ -58,6 +58,13 @@ inline double dist(double x1, double y1, double x2, double y2) {
 	return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
+inline double mv_gauss(double x, double y, double mu_x, double mu_y, double sigma[]) {
+	double gauss_norm = (1/(2*M_PI*sigma[0]*sigma[1]));
+	double exponent = ((x - mu_x)*(x - mu_x)) / (2 * (sigma[0]*sigma[1])) + ((y - mu_y)*(y - mu_y)) / (2 * (sigma[0]*sigma[1]));
+	double weight = gauss_norm * exp(-exponent);
+	return weight;
+}
+
 inline double * getError(double gt_x, double gt_y, double gt_theta, double pf_x, double pf_y, double pf_theta) {
 	static double error[3];
 	error[0] = fabs(pf_x - gt_x);

@@ -84,9 +84,9 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 			ntheta += dist_theta(gen);	
 
 			// set particle position
-			particles[i].x = dist_nx(gen);
-			particles[i].y = dist_ny(gen);
-			particles[i].theta = dist_ntheta(gen);
+			particles[i].x = nx; 
+			particles[i].y = ny;
+			particles[i].theta = ntheta; 
 		}
 	}
 	else {
