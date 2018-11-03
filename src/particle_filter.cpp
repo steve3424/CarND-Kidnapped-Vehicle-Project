@@ -180,6 +180,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 		// set new weight
 		particles[i].weight = new_weight;
+		weights[i] = new_weight;
 	}
 }
 
@@ -187,7 +188,43 @@ void ParticleFilter::resample() {
 	// TODO: Resample particles with replacement with probability proportional to their weight. 
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
-
+	
+	// PSEUDO-CODE
+	// vector<Particle> new_particles(num_particles);
+	// int index = random_int(0, num_particles);
+	// double beta = 0.0;
+	// double mw = max(weights);	
+	// for (int i=0; i < num_particles; ++i) {
+	//	beta += random(0, (2*mw));
+	//	while (beta > weights[index]) {
+	//		beta -= weights[index];
+	//		index = (index + 1) % N;
+	//	}
+	//
+	//	new_particles.push_back(particles[index]);
+	// }
+	//
+	// particles = new_particles;
+	
+	// random numbers
+	random_device rd;
+	uniform_int_distribution<> dist_index(0, num_particles);
+	uniform_real_distribution<> dist_beta(0.0, 1.0);
+        	
+	// resampling wheel
+	vector<Particle> new_particles(num_particles);
+	int index = dist_index(rd);
+	double beta = 0.0;
+	double max_weight = *max_element(weights.begin(), weights.end());
+	for (int i=0; i < num_particles; ++i) {
+		beta += dist_beta(rd) * 2.0 * max_weight;
+		while (beta > weights[index]) {
+			beta -= weights[index];
+			index = (index + 1) % num_particles;
+		}
+		new_particles.push_back(particles[index]);
+	}	
+	particles = new_particles;
 }
 
 Particle ParticleFilter::SetAssociations(Particle& particle, const std::vector<int>& associations, 
