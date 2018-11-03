@@ -33,7 +33,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	normal_distribution<double> dist_theta(theta, std[2]);
 
 	// set num of particles
-	num_particles = 10;
+	num_particles = 500;
 
 	// create all particles
 	for (int i=0; i < num_particles; ++i) {
@@ -212,7 +212,7 @@ void ParticleFilter::resample() {
 	uniform_real_distribution<> dist_beta(0.0, 1.0);
         	
 	// resampling wheel
-	vector<Particle> new_particles(num_particles);
+	vector<Particle> new_particles;
 	int index = dist_index(rd);
 	double beta = 0.0;
 	double max_weight = *max_element(weights.begin(), weights.end());
@@ -224,6 +224,7 @@ void ParticleFilter::resample() {
 		}
 		new_particles.push_back(particles[index]);
 	}	
+
 	particles = new_particles;
 }
 
