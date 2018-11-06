@@ -26,8 +26,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 	
-	// create normal distribution for sampling
-	default_random_engine gen;
+	// normal dist for init position noise 
 	normal_distribution<double> dist_x(x, std[0]);
 	normal_distribution<double> dist_y(y, std[1]);
 	normal_distribution<double> dist_theta(theta, std[2]);
@@ -60,8 +59,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 	
-	// random generator for gaussian noise
-	default_random_engine gen;
+	// normal dist for new position noise 
 	normal_distribution<double> dist_x(0, std_pos[0]);
 	normal_distribution<double> dist_y(0, std_pos[1]);
 	normal_distribution<double> dist_theta(0, std_pos[2]);
@@ -129,8 +127,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
 	
-	// gaussian noise for observation coordinates
-	default_random_engine gen;
+	// normal dist for observation noise 
 	normal_distribution<double> dist_x(0, std_landmark[0]);
 	normal_distribution<double> dist_y(0, std_landmark[1]);
 

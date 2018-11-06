@@ -9,6 +9,7 @@
 #ifndef PARTICLE_FILTER_H_
 #define PARTICLE_FILTER_H_
 
+#include <random>
 #include "helper_functions.h"
 
 struct Particle {
@@ -30,13 +31,14 @@ class ParticleFilter {
 	// Number of particles to draw
 	int num_particles; 
 	
-	
-	
 	// Flag, if filter is initialized
 	bool is_initialized;
 	
 	// Vector of weights of all particles
 	std::vector<double> weights;
+
+	// Random default engine for gaussian noise
+	std::default_random_engine gen;
 	
 public:
 	
