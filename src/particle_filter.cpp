@@ -65,7 +65,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	normal_distribution<double> dist_theta(0, std_pos[2]);
 
 	// check for 0 yaw rate
-	if (yaw_rate != 0) {
+	if (fabs(yaw_rate) > 0.00005) {
 		for (int i=0; i < num_particles; ++i) {
 			// intermediate variables
 			double theta = particles[i].theta;
