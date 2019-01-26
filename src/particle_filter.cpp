@@ -131,20 +131,20 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	normal_distribution<double> dist_x(0, std_landmark[0]);
 	normal_distribution<double> dist_y(0, std_landmark[1]);
 
-	// loop through each particle to update
+	// loop through each particle to update weight
 	for (int i=0; i < num_particles; ++i) {
 		double new_weight = 1.0;
 		for (unsigned int j=0; j < observations.size(); ++j) {
 			/////// TRANSFORM //////
 			LandmarkObs map_coords;
 			// intermediate variables
-			double x_particle = particles[i].x;
-			double y_particle = particles[i].y;
-			double x_obs = observations[j].x + dist_x(gen);
-			double y_obs = observations[j].y + dist_y(gen);
+			double x_particle = particles[i].x; // map coords
+			double y_particle = particles[i].y; // map coords
 			double theta = particles[i].theta;
+			double x_obs = observations[j].x + dist_x(gen); // vehicle coords + noise correction
+			double y_obs = observations[j].y + dist_y(gen); // vehicle coords + noise correction
 
-			// calculate map coords
+			// calculate map coords for observation from current particle
 			map_coords.x = double(x_particle + (cos(theta)*x_obs) - (sin(theta)*y_obs));
 			map_coords.y = double(y_particle + (sin(theta)*x_obs) + (cos(theta)*y_obs));
 
@@ -186,7 +186,7 @@ void ParticleFilter::resample() {
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 	
-	// use discrete_distribution to generate random indicies in weighted fashion
+	// use discrete_distribution to generate random indices in weighted fashion
 	discrete_distribution<> d(weights.begin(), weights.end());
 	
 	// create 1000 new samples
